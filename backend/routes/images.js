@@ -7,14 +7,14 @@ const fs = require('fs');
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-      cb(null, '../minesse/public/images_uploads/');
+      cb(null, '../frontend/public/images_uploads/');
   },
   filename: function(req, file, cb) {   
       cb(null, uuidv4() + '-' + Date.now() + path.extname(file.originalname));
   }
 });
 const fileFilter = (req, file, cb) => {
-  const allowedFileTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  const allowedFileTypes = ['application/pdf'];
   if(allowedFileTypes.includes(file.mimetype)) {
     req.isAdded = true;
       cb(null, true);
@@ -25,7 +25,7 @@ const fileFilter = (req, file, cb) => {
 } 
 let upload = multer({ storage, fileFilter });
 
-router.route('/add').post(upload.single('photo'), (req, res) => {
+router.route('/add').post(upload.single('file'), (req, res) => {
     const fileName = req.file.filename;
     if(req.isAdded){
       res.json({uploaded:true, fileName: fileName});
@@ -36,7 +36,7 @@ router.route('/add').post(upload.single('photo'), (req, res) => {
 });
 router.route('/delete').post((req, res) => {
   const fileName = req.body.fileName;
-  const filePath = '../minesse/public/images_uploads/'+fileName; 
+  const filePath = '../frontend/public/images_uploads/'+fileName; 
   fs.unlinkSync(filePath);
   res.json("Image Removed");
   

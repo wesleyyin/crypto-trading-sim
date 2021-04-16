@@ -7,10 +7,8 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     username: {type: String, required: true, unique: true},
     password: {type: String, required: true},
-    posts: [{type: ObjectID, ref: 'Post'}],//post ID array
-    notifications: [{type: ObjectID, ref: 'Notification'}],//notification ID array
     bio: {type: String, required: false},
-    profilePic : {type: String, required: false}
+    resume : {type: String, required: false}
 },{
     timestamps: true,
 });

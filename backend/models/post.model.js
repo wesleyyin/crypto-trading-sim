@@ -5,8 +5,10 @@ const Schema = mongoose.Schema;
 //picture will be stored in FS with post ID as name
 const postSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User' },
-    caption: {type: String, required: true},
-    photoName: {type: String, required: true}
+    companyName: {type: String, required: true},
+    roleName: {type: String, required: true},
+    caption: {type: String, required: false},
+    contactInfo: {type: String, required: true},
 },{
     timestamps: true,
 });
