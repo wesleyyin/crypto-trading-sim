@@ -1,4 +1,4 @@
-# minimalist_social_media
+# Referral platform
 
 Cited code:
 salted pass:
