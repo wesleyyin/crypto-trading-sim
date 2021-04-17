@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import UserProfile from './UserProfile';
+
 
 export default class Signup extends Component{
     constructor(props){

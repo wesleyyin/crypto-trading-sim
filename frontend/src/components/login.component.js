@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import UserProfile from './UserProfile';
+
 import {Link} from 'react-router-dom';
 export default class Login extends Component{
     constructor(props){
