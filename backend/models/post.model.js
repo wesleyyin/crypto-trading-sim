@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const postSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     cryptoName: {type: String, required: true},
-    action : {type: String, enum : ['BUY, SELL'], default: 'BUY'},
+    action : {type: String, enum : ['BUY', 'SELL'], default: 'BUY'},
     quantity: {type: Number, required: true}, //
     price: {type: Number, required: true}
     

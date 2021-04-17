@@ -34,11 +34,7 @@ router.route('/add').post((req,res) =>{
     });
     newPost.save()
         .then(function(post){
-            helper(post,function(err,ret){
-                if(err){
-                    res.json('Error: ' + err);
-                }res.json("Success!");
-            })
+            res.json("success");
             
             
         }
