@@ -28,6 +28,7 @@ class Dashboard extends Component {
     this.onChangeQuantity = this.onChangeQuantity.bind(this);
     this.submit = this.submit.bind(this);
     this.renderForm = this.renderForm.bind(this);
+    this.renderPieChart = this.renderPieChart.bind(this);
     this.state = {
       posts : [],
       bcLineSeries : [{
@@ -38,22 +39,16 @@ class Dashboard extends Component {
       bcData: [],
       bcPrice: 0,
       bcKey: 0,
-      bcLineSeries : [{
-          data: [
-              
-          ]
-      }],
+      
       ethData: [],
       ethPrice: 0,
-      ethKey: 0,
+      ethKey: 0.5,
       ethLineSeries : [{
         data: [
             
         ]
       }],
-      dogeData: [],
-      dogePrice: 0,
-      dogeKey: 0,
+      
       dogeLineSeries : [{
         data: [
             
@@ -61,7 +56,7 @@ class Dashboard extends Component {
       }],
       dogeData: [],
       dogePrice: 0,
-      dogeKey: 0,
+      dogeKey: 0.2,
       type: "BUY",
       cryptoName: "Bitcoin",
       quantity: 0
@@ -163,7 +158,7 @@ updatePosts(){
 }
 
   renderPosts(){
-    if(this.state.bcPrice==0){
+    if(this.state.bcPrice==0 || (this.state.ethPrice == 0|| this.state.dogePrice ==0)){
       return(<div></div>);
     }
       const posts = this.state.posts;
@@ -176,13 +171,15 @@ updatePosts(){
     </div>)
   }
   renderNW(){
-    if(this.state.bcPrice==0){
+    if(this.state.bcPrice==0 || (this.state.ethPrice == 0|| this.state.dogePrice ==0)){
       return (<h3>connecting...</h3>)
     }
     return(<div>
-      <h4>Current Balance($100,000 starting): ${(this.getCashVal() + this.getBCVal()).toFixed(2)}</h4>
+      <h4>Current Balance($100,000 starting): ${(this.getCashVal() + this.getBCVal() + this.getDOGEVal()+ this.getETHVal()).toFixed(2)}</h4>
       <h5>Cash: ${this.getCashVal().toFixed(2)}</h5>
       <h5>Bitcoin: ${this.getBCVal().toFixed(2)}</h5>
+      <h5>Ethereum: ${this.getETHVal().toFixed(2)}</h5>
+      <h5>Dogecoin ${this.getDOGEVal().toFixed(2)}</h5>
       </div>)
   }
   getCashVal(){
@@ -220,7 +217,48 @@ updatePosts(){
         
     }val = bitcoins * this.state.bcPrice;
     return val;
-  }//make more getters with more cryptos
+  }
+  getDOGEVal(){
+    let val = 0;
+    const posts = this.state.posts;
+    if(typeof posts === "undefined"||posts.length==0){
+        return val;
+    }
+    let dogecoins= 0;
+    for(let i = 0; i < posts.length; i++){
+        const post = posts[i];
+        if(post.cryptoName == "Dogecoin"){
+          if(post.action == "BUY"){
+            dogecoins += Number(post.quantity)/Number(post.price);
+          }else{
+            dogecoins -= Number(post.quantity)/Number(post.price);
+          }
+        }
+        
+    }val = dogecoins * this.state.dogePrice;
+    return val;
+  }
+  getETHVal(){
+    let val = 0;
+    const posts = this.state.posts;
+    if(typeof posts === "undefined"||posts.length==0){
+        return val;
+    }
+    let eth= 0;
+    for(let i = 0; i < posts.length; i++){
+        const post = posts[i];
+        if(post.cryptoName == "Ethereum"){
+          if(post.action == "BUY"){
+            eth += Number(post.quantity)/Number(post.price);
+          }else{
+            eth -= Number(post.quantity)/Number(post.price);
+          }
+        }
+        
+    }val = eth * this.state.ethPrice;
+    return val;
+  }
+  //make more getters with more cryptos
   handleTypeChange(e){
     this.setState({
       type: e.target.value
@@ -241,26 +279,39 @@ updatePosts(){
     let price = 0;
     const cash = this.getCashVal();
     const bc = this.getBCVal();
+    const eth = this.getETHVal();
+    const doge = this.getDOGEVal();
     const name = this.state.cryptoName;
 
     if(this.state.type == "BUY" && quantity> cash){
       alert("Insufficient Funds");
       return;
     }if(this.state.type == "SELL"){
-      if(name == "Bitcoin"){
-        price = this.state.bcPrice;
-        if(price==0){
-          alert("Still connecting");
-          return;
-        }
-        if(quantity > bc){
-          alert("Insufficient Funds");
+      if(name == "Bitcoin"&&quantity> bc){
+        alert("Insufficient Funds");
         return;
-        }
+      }if(name == "Ethereum"&&quantity> eth){
+        alert("Insufficient Funds");
+        return;
+      }if(name == "Dogecoin"&&quantity> doge){
+        alert("Insufficient Funds");
+        return;
       }
     }
     if(name == "Bitcoin"){
       price = this.state.bcPrice;
+      if(price==0){
+        alert("Still connecting");
+        return;
+      }
+    }else if(name == "Ethereum"){
+      price = this.state.ethPrice;
+      if(price==0){
+        alert("Still connecting");
+        return;
+      }
+    }else{
+      price = this.state.dogePrice;
       if(price==0){
         alert("Still connecting");
         return;
@@ -285,7 +336,7 @@ updatePosts(){
 
   }
   renderForm(){
-    if(this.state.bcPrice !=0){
+    if(this.state.bcPrice!=0 && (this.state.ethPrice != 0&& this.state.dogePrice !=0)){
       return(<div>
                 
                 <h5>Make a transaction</h5>
@@ -303,22 +354,52 @@ updatePosts(){
                 worth of:</p>
                 <select id = "selectedCrypto" value={this.state.cryptoName} onChange={this.handleCryptoNameChange}>
                         <option value="Bitcoin">Bitcoin</option>
+                        <option value="Ethereum">Ethereum</option>
+                        <option value="Dogecoin">Dogecoin</option>
                   </select>
                 
                 <button onClick = {this.submit}>Submit</button>
       </div>);
     }return(<div></div>);
   }
+  renderPieChart(){
+    if(this.state.bcPrice==0 || (this.state.ethPrice == 0|| this.state.dogePrice ==0)){
+      return (<div></div>)
+    }
+    //Relevant amounts of money held in each catergory
+    const eth = this.getETHVal();
+    const btc = this.getBCVal();
+    const doge = this.getDOGEVal();
+    const cash = this.getCashVal();
+
+    //TODO: display pie chart using the above values
+
+
+
+    //place pie chart between div values below
+    return(<div>
+      
+    </div>);
+  }
   render() {
     console.log("render");
     
     return (
       <div id = "postDisplay">
+        <h1>Crypto Trading Simulator</h1>
         <h1>{localStorage.getItem("username")}</h1>
-          <h2>Bitcoin</h2>
-          <Chart lineSeries={this.state.bcLineSeries} key = {this.state.bcKey}autoWidth height={320} />
-            
+
+          <div id = "charts" style = {{width : "700px"}}>
+            <h2>Bitcoin</h2>
+            <Chart lineSeries={this.state.bcLineSeries} key = {this.state.bcKey}height = {320} autoWidth/>
+            <h2>Ethereum</h2>
+            <Chart lineSeries={this.state.ethLineSeries} key = {this.state.ethKey}height = {320} autoWidth/>
+            <h2>Dogecoin</h2>
+            <Chart lineSeries={this.state.dogeLineSeries} key = {this.state.dogeKey}height = {320} autoWidth />
+          </div>
+          
             <this.renderNW/>
+            <this.renderPieChart/>
             <this.renderForm/>
             <h2>Transaction History</h2>
             <this.renderPosts/>
