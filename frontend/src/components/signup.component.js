@@ -56,9 +56,8 @@ export default class Signup extends Component{
                 if(res.data.status){
                     localStorage.setItem('userID', res.data.id);
                     localStorage.setItem('username', username);
-                    alert("works");
                     //TODO: redirect to posts page here
-                    window.location.href = "/search"
+                    window.location.href = "/"
                 }else{
                     alert(res.data.msg);
                 }
