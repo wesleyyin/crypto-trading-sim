@@ -6,15 +6,22 @@ import TransactionStub from './transaction-stub.component'
 
 import axios from 'axios'
 //pass in viewed user, connection status, and id of user who is viewing
+//btc
+//doge
+//eth
 
 class Dashboard extends Component {
   bcws = new WebSocket ("wss://stream.binance.us:9443/ws/btcusdt@trade");
+  ethws = new WebSocket ("wss://stream.binance.us:9443/ws/ethusdt@trade");
+  dogews = new WebSocket ("wss://stream.binance.us:9443/ws/dogeusdt@trade");
   constructor(props){
     super(props);
     
     this.updatePosts= this.updatePosts.bind(this);
     this.renderPosts = this.renderPosts.bind(this);
     this.bcOnMessage = this.bcOnMessage.bind(this);
+    this.ethOnMessage = this.ethOnMessage.bind(this);
+    this.dogeOnMessage = this.dogeOnMessage.bind(this);
     this.renderNW = this.renderNW.bind(this);
     this.handleTypeChange = this.handleTypeChange.bind(this);
     this.handleCryptoNameChange = this.handleCryptoNameChange.bind(this);
@@ -31,6 +38,30 @@ class Dashboard extends Component {
       bcData: [],
       bcPrice: 0,
       bcKey: 0,
+      bcLineSeries : [{
+          data: [
+              
+          ]
+      }],
+      ethData: [],
+      ethPrice: 0,
+      ethKey: 0,
+      ethLineSeries : [{
+        data: [
+            
+        ]
+      }],
+      dogeData: [],
+      dogePrice: 0,
+      dogeKey: 0,
+      dogeLineSeries : [{
+        data: [
+            
+        ]
+      }],
+      dogeData: [],
+      dogePrice: 0,
+      dogeKey: 0,
       type: "BUY",
       cryptoName: "Bitcoin",
       quantity: 0
@@ -47,6 +78,8 @@ class Dashboard extends Component {
         alert("you are not logged in");
         window.location.href = '/login';
     }this.bcws.onmessage = (e)=> this.bcOnMessage(e);
+    this.dogews.onmessage = (e)=> this.dogeOnMessage(e);
+    this.ethws.onmessage = (e)=> this.ethOnMessage(e);
     this.updatePosts();
 }
   
@@ -70,6 +103,48 @@ bcOnMessage(event){
         bcKey: pastKey+1
     })
     
+}
+ethOnMessage(event){
+  var response = JSON.parse(event.data)
+  var utcMiliSec = response.E
+  var d = new Date(0)
+  d.setUTCMilliseconds(utcMiliSec)
+  var temp = {time: utcMiliSec, value: response.p}
+  var data = this.state.ethData;
+  console.log(data);
+  var lineSeries = this.state.ethLineSeries;
+  console.log(lineSeries);
+  data.push(temp);
+  var pastKey = this.state.ethKey;
+  lineSeries[0].data = data
+  this.setState({
+      ethData: data,
+      ethPrice: Number(response.p),
+      ethLineSeries: lineSeries,
+      ethKey: pastKey+1
+  })
+  
+}
+dogeOnMessage(event){
+  var response = JSON.parse(event.data)
+  var utcMiliSec = response.E
+  var d = new Date(0)
+  d.setUTCMilliseconds(utcMiliSec)
+  var temp = {time: utcMiliSec, value: response.p}
+  var data = this.state.dogeData;
+  console.log(data);
+  var lineSeries = this.state.dogeLineSeries;
+  console.log(lineSeries);
+  data.push(temp);
+  var pastKey = this.state.dogeKey;
+  lineSeries[0].data = data
+  this.setState({
+      dogeData: data,
+      dogePrice: Number(response.p),
+      dogeLineSeries: lineSeries,
+      dogeKey: pastKey+1
+  })
+  
 }
 updatePosts(){
     const user = localStorage.getItem("userID");
@@ -212,6 +287,7 @@ updatePosts(){
   renderForm(){
     if(this.state.bcPrice !=0){
       return(<div>
+                
                 <h5>Make a transaction</h5>
                 <select id = "transtype" value={this.state.type} onChange={this.handleTypeChange}>
                         <option value="BUY">BUY</option>
@@ -238,9 +314,13 @@ updatePosts(){
     
     return (
       <div id = "postDisplay">
+        <h1>{localStorage.getItem("username")}</h1>
+          <h2>Bitcoin</h2>
           <Chart lineSeries={this.state.bcLineSeries} key = {this.state.bcKey}autoWidth height={320} />
+            
             <this.renderNW/>
             <this.renderForm/>
+            <h2>Transaction History</h2>
             <this.renderPosts/>
             
        

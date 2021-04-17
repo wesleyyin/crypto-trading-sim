@@ -12,7 +12,7 @@ router.route('/').get((req,res) =>{
 
 router.route('/byuser').post((req,res) =>{
     const user = req.body.user;
-    Post.find({user: user}).sort({"created_at": -1})
+    Post.find({user: user}).sort({"createdAt": -1})
         .then(posts => res.json(posts))
         .catch(err => res.json('Error: ' + err));
 });
