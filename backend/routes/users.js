@@ -39,7 +39,7 @@ router.route('/login').post((req,res) =>{
 router.route('/register').post((req,res) =>{
     console.log("in register");
     User.find({username : req.body.username}, function (err, exists){
-        if (exists.length>0){
+        if (exists.length){
             res.json({status: false, msg: 'User already exists, pick a new name.'});
         }else{
             const username = req.body.username;

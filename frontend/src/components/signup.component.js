@@ -52,7 +52,7 @@ export default class Signup extends Component{
 
         axios.post("http://localhost:5000/users/register", user)
             .then(function(res){
-                alert(res.data.status);
+     
                 if(res.data.status){
                     localStorage.setItem('userID', res.data.id);
                     localStorage.setItem('username', username);

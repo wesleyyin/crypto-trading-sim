@@ -43,7 +43,7 @@ export default class Login extends Component{
 
         axios.post("http://localhost:5000/users/login", user)
             .then(function(res){
-                alert(res.data.status);
+                
                 if(res.data.status){
                     localStorage.setItem('username', username);
                     localStorage.setItem('userID', res.data.id);

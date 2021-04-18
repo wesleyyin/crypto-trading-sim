@@ -1,4 +1,8 @@
 import React, { Component } from 'react';
+//import React, {PureComponent} from 'react';
+//import {PieChart} from 'react-minimal-pie-chart';
+import {PieChart, Pie, Sector, Cell, ResponsiveContainer, Legend} from 'recharts';
+import './style.css'
 import {Link} from 'react-router-dom';
 import Chart from 'kaktana-react-lightweight-charts'
 import './dashboard.css';
@@ -68,8 +72,8 @@ class Dashboard extends Component {
   
   componentDidMount(){
     const user = localStorage.getItem("userID");
-    alert(user);
-    if (user.length ==0) {
+    
+    if (user == null ||user.length ==0) {
         alert("you are not logged in");
         window.location.href = '/login';
     }this.bcws.onmessage = (e)=> this.bcOnMessage(e);
@@ -79,6 +83,7 @@ class Dashboard extends Component {
 }
   
 bcOnMessage(event){
+  event.preventDefault()
     var response = JSON.parse(event.data)
     var utcMiliSec = response.E
     var d = new Date(0)
@@ -100,6 +105,7 @@ bcOnMessage(event){
     
 }
 ethOnMessage(event){
+  event.preventDefault();
   var response = JSON.parse(event.data)
   var utcMiliSec = response.E
   var d = new Date(0)
@@ -121,6 +127,7 @@ ethOnMessage(event){
   
 }
 dogeOnMessage(event){
+  event.preventDefault();
   var response = JSON.parse(event.data)
   var utcMiliSec = response.E
   var d = new Date(0)
@@ -163,9 +170,19 @@ updatePosts(){
     }
       const posts = this.state.posts;
     if(typeof posts === "undefined"||posts.length==0){
-        return(<p>You have no transaction history</p>);
+        return(
+          <div>
+          <link rel = "stylesheet" type="text/css" href="style.css"/>
+          <p className = "whiteGenText">You have no transaction history</p></div>);
+          
     }return(<div>
+      <link rel = "stylesheet" type="text/css" href="style.css"/>
+      <h1 className = "yellowFi">
+        
+        History of Tendies:
+      </h1>
         {posts.map((post) =>
+            
             <TransactionStub post = {post} price={this.state.bcPrice}/>
         )}
     </div>)
@@ -174,12 +191,14 @@ updatePosts(){
     if(this.state.bcPrice==0 || (this.state.ethPrice == 0|| this.state.dogePrice ==0)){
       return (<h3>connecting...</h3>)
     }
-    return(<div>
-      <h4>Current Balance($100,000 starting): ${(this.getCashVal() + this.getBCVal() + this.getDOGEVal()+ this.getETHVal()).toFixed(2)}</h4>
-      <h5>Cash: ${this.getCashVal().toFixed(2)}</h5>
-      <h5>Bitcoin: ${this.getBCVal().toFixed(2)}</h5>
-      <h5>Ethereum: ${this.getETHVal().toFixed(2)}</h5>
-      <h5>Dogecoin ${this.getDOGEVal().toFixed(2)}</h5>
+    return(
+      <div>
+        <link rel = "stylesheet" type="text/css" href="style.css"/>
+        <h4 className = "whiteGenText">Curr Bal($100,000 start): ${(this.getCashVal() + this.getBCVal() + this.getDOGEVal()+ this.getETHVal()).toFixed(2)}</h4>
+        <h5 className = "whiteGenText">Cash: ${this.getCashVal().toFixed(2)}</h5>
+        <h5 className = "whiteGenText">Bitcoin: ${this.getBCVal().toFixed(2)}</h5>
+        <h5 className = "whiteGenText">Ethereum: ${this.getETHVal().toFixed(2)}</h5>
+        <h5 className = "whiteGenText">Dogecoin ${this.getDOGEVal().toFixed(2)}</h5>
       </div>)
   }
   getCashVal(){
@@ -338,20 +357,20 @@ updatePosts(){
   renderForm(){
     if(this.state.bcPrice!=0 && (this.state.ethPrice != 0&& this.state.dogePrice !=0)){
       return(<div>
-                
-                <h5>Make a transaction</h5>
+                <link rel = "stylesheet" type="text/css" href="style.css"/>
+                <h5 className= "genText">Make a transaction</h5>
                 <select id = "transtype" value={this.state.type} onChange={this.handleTypeChange}>
                         <option value="BUY">BUY</option>
                         <option value="SELL">SELL</option>
                   </select>
-                  <p>$
+                  <p className = "whiteGenText">$ Worth Of: 
                   <input type="number" id="quantity" 
                         required 
                         className = "form-control" 
                         value = {this.state.quantity}
                         onChange = {this.onChangeQuantity}/>
                 
-                worth of:</p>
+                </p>
                 <select id = "selectedCrypto" value={this.state.cryptoName} onChange={this.handleCryptoNameChange}>
                         <option value="Bitcoin">Bitcoin</option>
                         <option value="Ethereum">Ethereum</option>
@@ -372,12 +391,42 @@ updatePosts(){
     const doge = this.getDOGEVal();
     const cash = this.getCashVal();
 
+    const total = cash+btc+doge+eth;
+    const data = [
+      {name: "Ethereum", value: eth},
+      {name: "Bitcoin", value:btc},
+      {name: "Doge", value: doge},
+      {name:"Cash", value: cash},
+    ];
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+    const set = ["ETH", "BTC", "DOGE", "$"];
+    const innerRadius = 60;
+    const outerRadius = 80;
+    const Cx = 190;
+    const Cy = 100;
     //TODO: display pie chart using the above values
-
-
+    
 
     //place pie chart between div values below
     return(<div>
+      <PieChart width ={350} height ={300} onMouseEnter={this.onPieEnter}>
+      <Legend verticalAlign="top" height={36}/>
+        <Pie
+        data = {data}
+        cx = {Cx}
+        cy = {Cy}
+        innerRadius = {innerRadius}
+        outerRadius = {outerRadius}
+        fill="#8884d8"
+        paddingAngle={5}
+        dataKey = "value"
+        >
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Pie>
+      </PieChart>
+      
       
     </div>);
   }
@@ -385,27 +434,46 @@ updatePosts(){
     console.log("render");
     
     return (
-      <div id = "postDisplay">
-        <h1>Crypto Trading Simulator</h1>
-        <h1>{localStorage.getItem("username")}</h1>
-
-          <div id = "charts" style = {{width : "700px"}}>
-            <h2>Bitcoin</h2>
-            <Chart lineSeries={this.state.bcLineSeries} key = {this.state.bcKey}height = {320} autoWidth/>
-            <h2>Ethereum</h2>
-            <Chart lineSeries={this.state.ethLineSeries} key = {this.state.ethKey}height = {320} autoWidth/>
-            <h2>Dogecoin</h2>
-            <Chart lineSeries={this.state.dogeLineSeries} key = {this.state.dogeKey}height = {320} autoWidth />
-          </div>
+      <body className = "big">
+        <link rel = "stylesheet" type="text/css" href="style.css"/>
+        
+        <div id = "postDisplay">
+          <h1 className = "Title">Crypto Trading Simulator</h1>
           
+          <div className = "StatRectangle">
+            <h2 className="genText">Transaction History</h2>
+            <h1 className = "userName">{localStorage.getItem("username")}</h1>
             <this.renderNW/>
+            
             <this.renderPieChart/>
             <this.renderForm/>
-            <h2>Transaction History</h2>
-            <this.renderPosts/>
             
-       
-      </div>
+          </div>
+          
+            <div id = "charts" style = {{width : "700px"}}>
+              <h2 className="Currency" >Bitcoin</h2>
+              <Chart darkTheme lineSeries={this.state.bcLineSeries} key = {this.state.bcKey}height = {320} autoWidth/>
+              <h2 className="Currency">Ethereum</h2>
+              <Chart darkTheme lineSeries={this.state.ethLineSeries} key = {this.state.ethKey}height = {320} autoWidth/>
+              <h2 className="Currency">Dogecoin</h2>
+              <Chart darkTheme lineSeries={this.state.dogeLineSeries} key = {this.state.dogeKey}height = {320} autoWidth />
+            </div>
+
+            <div className = "renderForm">
+              <this.renderPosts/>
+            </div>
+            
+              
+              
+              
+              
+              
+              
+              
+          
+        </div>
+        
+      </body>
     );
   }
 }
