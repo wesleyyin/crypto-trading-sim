@@ -1,2 +1,2 @@
-# Referral platform
+# Crypto-Sim platform
 
